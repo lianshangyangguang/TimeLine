@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.time.view.timeline.MainActivity">
+
+    <com.time.view.timeline.TimeLine
+        android:layout_width="match_parent"
+        android:layout_height="60dp" />
+
+    <com.time.view.timeline.RulerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.qindachang.widget.RulerView
+        android:id="@+id/rulerView_height"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#ffd900"
+        app:alphaEnable="true"
+        app:lineColor="#ffffff"
+        app:lineMaxHeight="35dp"
+        app:lineMidHeight="30dp"
+        app:lineMinHeight="20dp"
+        app:lineSpaceWidth="7dp"
+        app:lineWidth="2dp"
+        app:maxValue="230.0"
+        app:minValue="70.0"
+        app:perValue="0.1"
+        app:selectorValue="170.0"
+        app:textColor="#ffffff"
+        app:textMarginTop="5dp"
+        app:textSize="18sp" />
+</LinearLayout>
