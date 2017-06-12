@@ -95,11 +95,11 @@ public class RuleView extends View {
                         Log.d("zxy", "22getPointerCount: " + event.getPointerCount());
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        Log.d("zxy", "ACTION_MOVE: " + event.getPointerCount());
+                        Log.d("zxy", "22ACTION_MOVE: " + event.getPointerCount());
                         mScrollHandler.removeCallbacks(mScrollRunnable);
                         break;
                     case MotionEvent.ACTION_UP:
-
+                        Log.d("zxy", "22ACTION_UP: " + event.getPointerCount());
                         mScrollHandler.post(mScrollRunnable);
                         break;
                 }
@@ -343,11 +343,9 @@ public class RuleView extends View {
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
 
-        switch (event.getAction()) {
+        switch (event.getAction()&MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                if (event.getPointerCount() == 2){
-                    beforeLength = getDistance(event);
-                }
+
                 break;
             case MotionEvent.ACTION_POINTER_UP:
                 Log.d("zxy", "ACTION_POINTER_UP: ");
@@ -361,13 +359,22 @@ public class RuleView extends View {
                     }
                     float gapLenght = afterLenght - beforeLength;// 变化的长度
                     if (Math.abs(gapLenght) > 5f) {
-                        mScale = beforeLength /afterLenght  ;// 求的缩放的比例
+                        mScale = afterLenght / beforeLength ;// 求的缩放的比例
                         gap *= mScale;
                         invalidate();
                         beforeLength = afterLenght;
                     }
                 }
                 break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                if (event.getPointerCount() == 2){
+                    beforeLength = getDistance(event);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.d("zxy", "ACTION_UP: ");
+                break;
+
         }
 
         return true;
