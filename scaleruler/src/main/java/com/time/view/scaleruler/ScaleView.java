@@ -201,8 +201,22 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
 
     @Override
     public void onScroll(int distance) {
-        this.distance += distance;
 
+        this.distance += distance;
+//        mCenterNum -=(int)( this.distance/dis);
+//        this.distance = this.distance%dis;
+//
+//                if (mCenterNum <= 0 && this.distance >0){
+//            return;
+//        }
+//        if (mCenterNum >= 24 && this.distance <0){
+//            return;
+//        }
+
+
+//        Log.d("zxy", "mCenterNum: "+mCenterNum +"this.distance:"+this.distance);
+
+//        || mCenterNum == 24
 //        offset += distance;
 ////        layout(10,10,500,500);
 //        if (offset > dis) {
@@ -224,9 +238,8 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
     @Override
     public void onFinished() {
             //还原中心点在刻度位置上
-            mCenterNum -=Math.round(distance/dis);
-        distance = 0;
-//            offset = 0;
+            mCenterNum -=Math.round((float) distance/dis);
+            distance = 0;
             refreshCanvas();
     }
 
@@ -252,11 +265,6 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
             }
         }
         maxNum = hourNum * 24;
-        if (hourNum == 1){
-            mScaleMarkPaint.setTextSize(10);
-        }else {
-            mScaleMarkPaint.setTextSize(mTextHeight);
-        }
 
 //        Log.d("zxy", "mScale: "+mScale);
 //        float hour = 0;
