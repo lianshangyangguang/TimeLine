@@ -100,7 +100,11 @@ public class RuleView extends View {
                         break;
                     case MotionEvent.ACTION_UP:
                         Log.d("zxy", "22ACTION_UP: " + event.getPointerCount());
-                        mScrollHandler.post(mScrollRunnable);
+                        if (event.getPointerCount() == 2 || isDouble){
+                            mScrollHandler.removeCallbacks(mScrollRunnable);
+                        }else if (isDouble == false){
+                            mScrollHandler.post(mScrollRunnable);
+                        }
                         break;
                 }
                 return false;
@@ -339,6 +343,7 @@ public class RuleView extends View {
     }
 
     private float beforeLength,afterLenght,mScale;
+    private boolean isDouble = false;
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -349,10 +354,14 @@ public class RuleView extends View {
                 break;
             case MotionEvent.ACTION_POINTER_UP:
                 Log.d("zxy", "ACTION_POINTER_UP: ");
+                if (event.getPointerCount() == 2){
+                    mScrollHandler.removeCallbacks(mScrollRunnable);
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 Log.d("zxy", "ACTION_MOVE: " + event.getPointerCount());
                 if (event.getPointerCount() == 2){
+                    isDouble = true;
                     afterLenght = getDistance(event);// 获取两点的距离
                     if (beforeLength == 0){
                         beforeLength = afterLenght;
@@ -373,6 +382,12 @@ public class RuleView extends View {
                 break;
             case MotionEvent.ACTION_UP:
                 Log.d("zxy", "ACTION_UP: ");
+                if (event.getPointerCount() == 2){
+                    mScrollHandler.removeCallbacks(mScrollRunnable);
+                }else {
+                    mScrollHandler.post(mScrollRunnable);
+                    isDouble = false;
+                }
                 break;
 
         }
