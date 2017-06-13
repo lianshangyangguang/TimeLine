@@ -116,9 +116,9 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
             numberListener.onChanged(getTime());
 
         while(true){
-            int left = centerX - dis * count;
+            int left = centerX+distance - dis * count;
             int leftNum = mCenterNum - count * scaleNum;
-            int right = centerX + dis * count;
+            int right = centerX+distance + dis * count;
             int rightNum = mCenterNum + count * scaleNum;
 
             String leftText = String.valueOf(Math.round(leftNum/hourNum))+":00";
@@ -158,7 +158,7 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
             }
 
             count++;
-            if(left < 0)
+            if(left < -Math.abs(distance)*2)
                 break;
         }
     }
@@ -197,19 +197,22 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
 
     }
 
+    int distance = 0;
 
     @Override
     public void onScroll(int distance) {
-        offset += distance;
-//        layout(10,10,500,500);
-        if (offset > dis) {
-            offset = 0;
-            mCenterNum -= scaleNum;
-        }
-        if (offset < -dis) {
-            offset = 0;
-            mCenterNum += scaleNum;
-        }
+        this.distance += distance;
+
+//        offset += distance;
+////        layout(10,10,500,500);
+//        if (offset > dis) {
+//            offset = 0;
+//            mCenterNum -= scaleNum;
+//        }
+//        if (offset < -dis) {
+//            offset = 0;
+//            mCenterNum += scaleNum;
+//        }
         refreshCanvas();
     }
 
@@ -220,11 +223,11 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
 
     @Override
     public void onFinished() {
-        if(offset != 0) {
             //还原中心点在刻度位置上
-            offset = 0;
+            mCenterNum -=Math.round(distance/dis);
+        distance = 0;
+//            offset = 0;
             refreshCanvas();
-        }
     }
 
     @Override
