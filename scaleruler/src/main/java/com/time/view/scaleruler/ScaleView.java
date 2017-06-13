@@ -12,9 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.TextureView;
 
-/**
- * Created by user on 2016/6/1.
- */
+
 public class ScaleView extends TextureView implements TextureView.SurfaceTextureListener, ScaleScroller.ScrollingListener{
 
     ScaleScroller mScroller;
@@ -22,7 +20,6 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
     private Rect mTextRect = new Rect();
     private RectF mBorderRectF = new RectF();
 
-//    private Paint mBorderFillPaint = new Paint();
     private Paint mBorderPaint = new Paint();
     private Paint mCurrentMarkPaint = new Paint();
     private Paint mScaleMarkPaint = new Paint();
@@ -31,7 +28,7 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
 
     private int mCenterNum; //中心点数字
     private int offset = 0;
-    private int dis = 20;  //刻度间距   由mWidth 和 allBlockNum计算得到
+    private int dis = 0;  //刻度间距   由mWidth 和 allBlockNum计算得到
     private int allBlockNum = 30;  //刻度分割块的数量 默认30
     private float mWidth;
 
@@ -39,20 +36,32 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
     private int minNum = 0; //最小数字
     private int scaleNum = 1; //每一个刻度间相差数
 
+    private int hourNum = 10;
+
     private NumberListener numberListener;
+
+    private Context context;
 
     public ScaleView(Context context) {
         super(context);
+        this.context =context;
+        dis = dip2px(12);
         init();
+//        this(context, null,0);
     }
 
     public ScaleView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+//        this(context, attrs,0);
+        super(context,attrs);
+        this.context =context;
+        dis = dip2px(12);
         init();
     }
 
     public ScaleView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.context =context;
+        dis = dip2px(12);
         init();
     }
 
@@ -66,10 +75,6 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
         mBorderPaint.setColor(0xffffdfbe);
         mBorderPaint.setStyle(Paint.Style.STROKE);
         mBorderPaint.setStrokeWidth(2);
-
-//        mBorderFillPaint.setColor(0xfffffced);
-//        mBorderFillPaint.setStyle(Paint.Style.FILL);
-//        mBorderFillPaint.setStrokeWidth(2);
 
         //刻度线
         mScaleMarkPaint.setColor(0xff979797);
@@ -108,7 +113,7 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
         if (mCenterNum < minNum)
             mCenterNum = minNum;
         if(numberListener != null)
-            numberListener.onChanged(mCenterNum);
+            numberListener.onChanged(getTime());
 
         while(true){
             int left = centerX - dis * count;
@@ -116,17 +121,18 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
             int right = centerX + dis * count;
             int rightNum = mCenterNum + count * scaleNum;
 
-//            if (rightNum == maxNum || leftNum == minNum){
-//                break;
-//            }
+            String leftText = String.valueOf(Math.round(leftNum/hourNum))+":00";
+            String rightText = String.valueOf(Math.round(rightNum/hourNum))+":00";
 
-            String leftText = String.valueOf(leftNum/10)+":00";
-            String rightText = String.valueOf(rightNum/10)+":00";
+            int showNum = hourNum;
+            if (hourNum == 1){
+                showNum = 3;
+            }
             //间隔5刻度画文字信息
             if (leftNum < minNum){
 //                break;
             }else {
-                if(leftNum % (10*scaleNum) == 0) {
+                if(leftNum % (showNum*scaleNum) == 0) {
 //                canvas.drawLine(left, canvas.getHeight() / 2, left, canvas.getHeight() - 1, mScaleMarkPaint);
                     canvas.drawLine(left,0, left, canvas.getHeight() / 2 ,mScaleMarkPaint);
                     mScaleMarkPaint.getTextBounds(leftText, 0, leftText.length(), mTextRect);
@@ -140,7 +146,7 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
             if (rightNum > maxNum){
 //                break;
             }else {
-                if(rightNum % (10*scaleNum) == 0) {
+                if(rightNum % (showNum*scaleNum) == 0) {
 //                canvas.drawLine(right, canvas.getHeight() / 2, right, canvas.getHeight() - 1, mScaleMarkPaint);
                     canvas.drawLine(right, 0, right, canvas.getHeight() / 2, mScaleMarkPaint);
                     mScaleMarkPaint.getTextBounds(rightText, 0, rightText.length(), mTextRect);
@@ -170,13 +176,9 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-
-        Log.d("zxy", "onSurfaceTextureAvailable: "+width+","+height);
-
         mBorderRectF.set(mBorderPaint.getStrokeWidth(), mBorderPaint.getStrokeWidth(),
                 width - mBorderPaint.getStrokeWidth(), height - mBorderPaint.getStrokeWidth());
         mWidth = mBorderRectF.width();
-//        dis = (int)(mWidth / allBlockNum);
         refreshCanvas();
     }
 
@@ -199,6 +201,7 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
     @Override
     public void onScroll(int distance) {
         offset += distance;
+//        layout(10,10,500,500);
         if (offset > dis) {
             offset = 0;
             mCenterNum -= scaleNum;
@@ -217,9 +220,6 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
 
     @Override
     public void onFinished() {
-
-        Log.d("zxy", "onFinished: ");
-
         if(offset != 0) {
             //还原中心点在刻度位置上
             offset = 0;
@@ -229,13 +229,50 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
 
     @Override
     public void onJustify(float mScale) {
-        dis *= mScale;
-        if (dis <= 15){
-            dis = 15;
+//        if (mScale < 0.5f){
+//            mScale = 0.5f;
+//        }else if (mScale >2){
+//            mScale = 2;
+//        }
+        int index = 0;
+        index =  getIndex(hourNum);
+        if (index == -1){
+            //
         }
-        if (dis >= 50){
-            dis = 50;
+        if (mScale >1){
+            if (index + 1 <= multiple.length-1){
+                hourNum = multiple[index +1];
+            }
+        }else if (mScale <1){
+            if (index - 1 >=0){
+                hourNum = multiple[index -1];
+            }
         }
+        maxNum = hourNum * 24;
+        if (hourNum == 1){
+            mScaleMarkPaint.setTextSize(10);
+        }else {
+            mScaleMarkPaint.setTextSize(mTextHeight);
+        }
+
+//        Log.d("zxy", "mScale: "+mScale);
+//        float hour = 0;
+//        int shourNum = hourNum;
+//        hour = hourNum*(mScale*1000);
+//
+//        if ((int)(hour/1000) != 0){
+//            hourNum = (int)(hour/1000);
+//            if (hourNum == shourNum){
+//                if (mScale >1){
+//                    hourNum += 1;
+//                }else if (mScale <1){
+//                    hourNum -= 1;
+//                }
+//            }
+//            maxNum = hourNum * 24;
+//        }
+
+        Log.d("zxy", "maxNum: "+maxNum+"hourNum: "+hourNum);
         refreshCanvas();
     }
 
@@ -245,7 +282,7 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
     }
 
     interface NumberListener{
-        public void onChanged(int mCurrentNum);
+        public void onChanged(float time);
     }
 
 
@@ -278,14 +315,36 @@ public class ScaleView extends TextureView implements TextureView.SurfaceTexture
     }
 
     @Override
-    public int getmCenterNum() {
-        return mCenterNum;
+    public float getTime() {
+        return  (float) mCenterNum/hourNum;
+    }
+
+    //获取当前时间（毫秒）
+    public long getCurrentTime(){
+        return  (long) ((double) mCenterNum/hourNum)*60*24*1000*60;
     }
 
     @Override
-    public void setmCenterNum(int centerNum) {
-//        setCenterNum(mCenterNum);
-        mCenterNum = centerNum;
+    public void setTime(float time) {
+
+        mCenterNum = (int)time * hourNum;
+        Log.e("zxy", "setTime: "+time * hourNum);
         refreshCanvas();
+    }
+
+    private int[] multiple  = new int[]{1,2,3,4,5,6,10,15,20,30,60};
+
+    private int getIndex(int num){
+        for (int i = 0 ;i<multiple.length;i++){
+            if (multiple[i] == num){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private int dip2px(float dipValue) {
+        final float scale =context.getResources().getDisplayMetrics().density;
+        return (int) (dipValue * scale + 0.5f);
     }
 }

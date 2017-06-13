@@ -10,7 +10,6 @@ import android.widget.Scroller;
 
 /**
  * 监听滑动
- * Created by user on 2016/6/1.
  */
 public class ScaleScroller {
 
@@ -42,6 +41,9 @@ public class ScaleScroller {
     private GestureDetector.SimpleOnGestureListener simpleOnGestureListener = new GestureDetector.SimpleOnGestureListener(){
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+
+            Log.d("zxy", "onScroll: ");
+//            scroller.startScroll(0,0,(int) distanceX,0);
             return true;
         }
 
@@ -71,7 +73,7 @@ public class ScaleScroller {
     }
     private float beforeLength,afterLenght,mScale;
     private boolean isDouble = false;
-    private int mCenterNum;
+    private float time;
 
     //由外部传入event事件
     public boolean onTouchEvent(MotionEvent event){
@@ -92,11 +94,11 @@ public class ScaleScroller {
                     beforeLength = afterLenght;
                 }
                 float gapLenght = afterLenght - beforeLength;// 变化的长度
-                if (Math.abs(gapLenght) > 15f) {
+                if (Math.abs(gapLenght) > 20f) {
                     mScale = afterLenght / beforeLength ;// 求的缩放的比例
                     listener.onJustify(mScale);
+                    listener.setTime(time);
                     beforeLength = afterLenght;
-                    mCenterNum =listener.getmCenterNum();
                 }
             }
 
@@ -105,15 +107,14 @@ public class ScaleScroller {
             if (event.getPointerCount() == 1 && isDouble == false){
                 listener.onFinished();
             }else if (isDouble == true){
-//                isDouble = false;
-                listener.setmCenterNum(mCenterNum);
-                Log.d("zxy", "ACTION_UP:  mCenterNum "+mCenterNum);
+                listener.setTime(time);
             }
 
         }else if ((event.getAction()&MotionEvent.ACTION_MASK) == MotionEvent.ACTION_POINTER_DOWN){
             if (event.getPointerCount() == 2){
                 beforeLength = getDistance(event);
                 isDouble = true;
+                time =listener.getTime();
             }
         }
         gestureDetector.onTouchEvent(event);
@@ -141,9 +142,9 @@ public class ScaleScroller {
 
         void onJustify(float mScale);
 
-        int getmCenterNum();
+        float getTime();
 
-        void setmCenterNum(int mCenterNum);
+        void setTime(float time);
     }
 
 }

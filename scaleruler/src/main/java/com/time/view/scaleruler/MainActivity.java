@@ -19,25 +19,27 @@ public class MainActivity extends AppCompatActivity {
         scaleview.setMinNumber(0);
         scaleview.setScaleNumber(1);
         scaleview.setAllBlockNum(30);
-        scaleview.setTextSize(30);
+        scaleview.setTextSize(20);
         scaleview.setCenterNum(100);
         scaleview.setNumberListener(new ScaleView.NumberListener() {
             @Override
-            public void onChanged(int mCurrentNum) {
-                String hour = "",min ="";
-                if (mCurrentNum/10<10){
-                    hour = "0"+mCurrentNum/10;
+            public void onChanged(float time) {
+
+                String smin = "";
+                int min  =(int) ( time * 60 )%60;
+                if (min < 10 ){
+                    smin = "0"+min;
                 }else {
-                    hour =String.valueOf(mCurrentNum/10);
+                    smin = min+"";
                 }
-                if (mCurrentNum%10 == 0){
-                    min = "00";
-                }else if ((mCurrentNum%10) *6<10){
-                    min =  "0"+(mCurrentNum%10) *6;
+                String sh ="";
+                int h  =(int) ( time * 60 )/60;
+                if (h < 10 ){
+                    sh = "0"+h;
                 }else {
-                    min = String.valueOf((mCurrentNum%10) *6);
+                    sh = h+"";
                 }
-                tvNumber.setText(hour + ":"+min);
+                tvNumber.setText(sh+":"+smin);
             }
         });
     }
